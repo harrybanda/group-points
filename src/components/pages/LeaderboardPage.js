@@ -78,6 +78,7 @@ class LeaderboardPage extends Component {
       if (snapshot.exists()) {
         postRef.on("child_added", snap => {
           newArray.push({
+            id: snap.key,
             link: snap.val().link,
             timestamp: snap.val().createdAt,
             points: snap.val().points
@@ -486,6 +487,7 @@ class LeaderboardPage extends Component {
                 userData={this.state.selectedMemberData}
                 postData={this.state.postData}
                 loadingPostData={this.state.loadingPostData}
+                isManage={false}
               />
             </Fragment>
           );

@@ -244,18 +244,6 @@ class ManagePage extends Component {
       });
   };
 
-  handleDel = () => {
-    const groupRef = database.ref("groups").child(this.state.groupid);
-    const memberId = app.auth().currentUser.uid;
-    const memberRef = database
-      .ref("members")
-      .child(memberId)
-      .child("groups")
-      .child(this.state.groupid);
-    groupRef.remove();
-    memberRef.remove();
-  };
-
   removeDuplicates(myArr, prop) {
     return myArr.filter((obj, pos, arr) => {
       return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
@@ -325,6 +313,7 @@ class ManagePage extends Component {
       if (snapshot.exists()) {
         postRef.on("child_added", snap => {
           newArray.push({
+            id: snap.key,
             link: snap.val().link,
             timestamp: snap.val().createdAt,
             points: snap.val().points
@@ -342,6 +331,56 @@ class ManagePage extends Component {
 
   goToLb = () => {
     this.setState({ redirectToLb: true });
+  };
+
+  handleDeleteActivity = e => {
+    const userID = this.state.selectedMemberData.id;
+    const userPoints = this.state.selectedMemberData.points;
+    const groupID = this.state.groupid;
+    const subVal = e.points;
+    const id = e.id;
+
+    const groupMemberRef = database
+      .ref("groups")
+      .child(groupID)
+      .child("members")
+      .child(userID);
+
+    const memberGroupRef = database
+      .ref("members")
+      .child(userID)
+      .child("groups")
+      .child(groupID);
+
+    const postRef = database
+      .ref("posts")
+      .child(groupID)
+      .child(userID)
+      .child(id);
+
+    let afterSub = userPoints - subVal;
+
+    groupMemberRef.update({
+      points: afterSub
+    });
+
+    memberGroupRef.update({
+      points: afterSub
+    });
+
+    let selectedMemberData = { ...this.state.selectedMemberData };
+    selectedMemberData.points = afterSub;
+    this.setState({ selectedMemberData });
+
+    postRef.remove();
+
+    this.getGroupMembers();
+
+    if (afterSub === 0) {
+      this.setState({ postData: [] });
+    } else {
+      this.getPostData(this.state.selectedMemberData);
+    }
   };
 
   componentDidMount() {
@@ -655,6 +694,8 @@ class ManagePage extends Component {
                   userData={this.state.selectedMemberData}
                   postData={this.state.postData}
                   loadingPostData={this.state.loadingPostData}
+                  isManage={true}
+                  handleDeleteActivity={this.handleDeleteActivity}
                 />
                 <ToastContainer
                   position="top-center"

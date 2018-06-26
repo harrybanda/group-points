@@ -10,6 +10,8 @@ class Profile extends Component {
     const userData = this.props.userData;
     const postData = this.props.postData;
     let loading = this.props.loadingPostData;
+    const isManage = this.props.isManage;
+    const handleDel = this.props.handleDeleteActivity;
 
     if (!modalState) {
       return null;
@@ -18,7 +20,10 @@ class Profile extends Component {
     return (
       <div className="modal is-active">
         <div className="modal-background" />
-        <div className="modal-card" style={{ width: "400px" }}>
+        <div
+          className="modal-card"
+          style={isManage ? { width: "500px" } : { width: "400px" }}
+        >
           <header className="modal-card-head">
             <p className="modal-card-title has-text-grey-dark">Profile</p>
             <button
@@ -95,16 +100,34 @@ class Profile extends Component {
                               </p>
                             </div>
                             <div className="column">
-                              <a
-                                className="button is-link is-pulled-right is-rounded is-small"
-                                href={data.link}
-                                target="_blank"
-                              >
-                                <span className="icon">
-                                  <i className="fab fa-facebook" />
-                                </span>
-                                <span>View Post</span>
-                              </a>
+                              <div className="field is-grouped is-pulled-right">
+                                <p className="control">
+                                  <a
+                                    className="button is-link is-rounded is-small"
+                                    href={data.link}
+                                    target="_blank"
+                                  >
+                                    <span className="icon">
+                                      <i className="fab fa-facebook" />
+                                    </span>
+                                    <span>View Post</span>
+                                  </a>
+                                </p>
+
+                                {isManage ? (
+                                  <p className="control">
+                                    <a
+                                      className="button is-danger is-rounded is-small"
+                                      onClick={() => handleDel(data)}
+                                    >
+                                      <span className="icon">
+                                        <i className="far fa-trash-alt" />
+                                      </span>
+                                      <span>Delete Points</span>
+                                    </a>
+                                  </p>
+                                ) : null}
+                              </div>
                             </div>
                           </div>
                         </div>
