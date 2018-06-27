@@ -2,19 +2,21 @@
 A web application that helps to boost community engagement in Facebook groups with gamification, by rewarding members with points for contributing.
 
 # Requirements
-Firebase auth
-Firebase database
-axios
-bulma
-moment
-react-copy-to-clipboard
-react-lines-ellipsis
-react-router-dom
-react-spinners
-react-toastify
-fontawesome.
+- Firebase auth
+- Firebase database
+- axios
+- bulma
+- moment
+- react-copy-to-clipboard
+- react-lines-ellipsis
+- react-router-dom
+- react-spinners
+- react-toastify
+- fontawesome.
 
 this is the firebase database structure :
+
+```json
 
 {
   "groups" : {
@@ -57,3 +59,7 @@ this is the firebase database structure :
     }
   }
 }
+
+
+```
+
