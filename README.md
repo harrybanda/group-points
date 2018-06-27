@@ -1,7 +1,7 @@
-#Group Points
+# Group Points
 A web application that helps to boost community engagement in Facebook groups with gamification, by rewarding members with points for contributing.
 
-#Requirements
+# Requirements
 Firebase auth
 Firebase database
 axios
