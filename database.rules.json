@@ -1,6 +1,32 @@
 {
   "rules": {
     ".read": true,
-    ".write": "auth != null"
+  	"members": {
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        "groups": {
+      		"$groupId": {
+      			".write": "root.child('members').child(auth.uid).child('groups').child($groupId).child('admin').val() == true"
+      		}
+    		}
+      }
+    },
+		"groups": {
+     "$groupId": {
+        ".write": "root.child('members').child(auth.uid).child('groups').child($groupId).child('admin').val() == true",
+        "members": {
+      		"$uid": {
+        		".write": "auth != null && auth.uid == $uid"
+      		}
+    		}
+      }
+    },
+    "posts": {
+      "$groupId": {
+      	"$uid": {
+        	".write": "root.child('members').child(auth.uid).child('groups').child($groupId).child('admin').val() == true"
+      	}
+    	}
+    }
   }
 }
