@@ -271,8 +271,8 @@ class LeaderboardPage extends Component {
       .ref("groups")
       .child(this.state.groupid)
       .child("members")
-      .orderByChild("admin")
-      .equalTo(false);
+      .orderByChild("points")
+      .startAt(10);
 
     groupMemberRef.on("value", snap => {
       if (snap.exists()) {
