@@ -118,10 +118,11 @@ class GroupsPage extends Component {
               `https://graph.facebook.com/me?access_token=${token}&fields=groups,first_name`
             )
             .then(result => {
-              let groupsData = result.data.groups.data;
               let firstname = result.data.first_name;
-              localStorage.setItem("groups", JSON.stringify(groupsData));
               localStorage.setItem("firstname", firstname);
+
+              let groupsData = result.data.groups.data;
+              localStorage.setItem("groups", JSON.stringify(groupsData));
             })
             .catch(error => console.log(error));
         }
