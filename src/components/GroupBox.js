@@ -50,14 +50,11 @@ class GroupBox extends Component {
         <div className="has-text-centered">
           {admin ? (
             <Link to={"/" + id + "/manage"} className="button is-primary ">
-              <span className="icon">
-                <i className="fas fa-cog" />
-              </span>
-              <span>Manage</span>
+              <span>Open</span>
             </Link>
           ) : (
             <Link to={"/" + id + "/home"} className="button is-primary ">
-              <span>View</span>
+              <span>Open</span>
             </Link>
           )}
         </div>

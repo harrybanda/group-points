@@ -347,8 +347,6 @@ class LeaderboardPage extends Component {
           if (this.state.loadingAdminCheck) {
             return <Loader />;
           }
-          console.log("pos: " + this.state.position)
-          console.log("ordinal: " + this.state.ordinal)
           return (
             <Fragment>
               <Header user={this.props.user} isGroups={false} />
