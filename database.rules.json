@@ -15,6 +15,7 @@
      "$groupId": {
         ".write": "root.child('members').child(auth.uid).child('groups').child($groupId).child('admin').val() == true",
         "members": {
+          ".indexOn": ["admin", "points"],
       		"$uid": {
         		".write": "auth != null && auth.uid == $uid"
       		}
