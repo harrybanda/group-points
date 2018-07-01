@@ -51,6 +51,7 @@ class AddGroup extends Component {
             <header className="modal-card-head">
               <p className="modal-card-title has-text-grey-dark">Add Group</p>
               <button
+                type="button"
                 className="delete"
                 onClick={closeModal}
                 aria-label="close"

@@ -224,8 +224,7 @@ class ManagePage extends Component {
     memberRef
       .once("value", function(snapshot) {
         points = snapshot.val().points + selectedPoints;
-      })
-      .then(function() {
+
         memberRef.update({
           points: points
         });
@@ -241,7 +240,7 @@ class ManagePage extends Component {
         });
 
         self.getGroupMembers();
-      });
+      })
   };
 
   removeDuplicates(myArr, prop) {

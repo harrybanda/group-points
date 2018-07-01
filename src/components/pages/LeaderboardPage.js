@@ -318,11 +318,16 @@ class LeaderboardPage extends Component {
   };
 
   componentDidMount() {
+    this.cancelSource = axios.CancelToken.source();
     if (this.props.user) {
       this.updateMember();
       this.checkGroup();
       this.getGroupMembers();
     }
+  }
+
+  componentWillUnmount() {
+    this.cancelSource.cancel();
   }
 
   render() {

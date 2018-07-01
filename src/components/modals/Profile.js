@@ -27,6 +27,7 @@ class Profile extends Component {
           <header className="modal-card-head">
             <p className="modal-card-title has-text-grey-dark">Profile</p>
             <button
+              type="button"
               onClick={closeModal}
               className="delete"
               aria-label="close"

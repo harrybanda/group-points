@@ -190,10 +190,15 @@ class GroupsPage extends Component {
   }
 
   componentDidMount() {
+    this.cancelSource = axios.CancelToken.source();
     if (this.props.user) {
       this.getManagedGroups();
       this.addManagedGroups();
     }
+  }
+
+  componentWillUnmount() {
+    this.cancelSource.cancel();
   }
 
   render() {

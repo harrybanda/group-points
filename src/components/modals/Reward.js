@@ -27,7 +27,7 @@ class Reward extends Component {
           <form onKeyPress={this.onEnterKeyPress} onSubmit={handleFormSubmit}>
             <header className="modal-card-head">
               <p className="modal-card-title has-text-grey-dark">Reward</p>
-              <button className="delete" onClick={closeModal} aria-label="close" />
+              <button type="button" className="delete" onClick={closeModal} aria-label="close" />
             </header>
             <section className="modal-card-body">
               <div className="field">
@@ -57,7 +57,6 @@ class Reward extends Component {
                   </span>
                 </p>
               </div>
-
               <div className="field">
                 <div className="control has-icons-left">
                   <input
