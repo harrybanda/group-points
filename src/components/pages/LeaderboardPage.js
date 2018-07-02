@@ -458,7 +458,7 @@ class LeaderboardPage extends Component {
                                       className="subtitle is-4 has-text-grey-light"
                                       style={{ paddingTop: "25px" }}
                                     >
-                                      No Members
+                                      No one has earned points yet
                                     </p>
                                   </td>
                                 </tr>
