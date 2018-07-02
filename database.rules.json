@@ -12,6 +12,7 @@
       }
     },
 		"groups": {
+     ".write": "auth != null",
      "$groupId": {
         ".write": "root.child('members').child(auth.uid).child('groups').child($groupId).child('admin').val() == true",
         "members": {
