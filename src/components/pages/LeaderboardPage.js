@@ -455,7 +455,7 @@ class LeaderboardPage extends Component {
                                 <tr>
                                   <td className="has-text-centered">
                                     <p
-                                      className="subtitle is-4 has-text-grey-light"
+                                      className="subtitle is-5 has-text-grey-light"
                                       style={{ paddingTop: "25px" }}
                                     >
                                       No one has earned points yet
