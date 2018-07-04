@@ -4,6 +4,7 @@ import { app, database } from "../../client";
 import axios from "axios";
 
 import Profile from "../modals/Profile";
+import Prizes from "../modals/Prizes";
 import LbListItem from "../LbListItem";
 import Header from "../Header";
 import Loading from "../Loading";
@@ -42,7 +43,10 @@ class LeaderboardPage extends Component {
       position: "",
       ordinal: "",
       loadLeaderboard: true,
-      loadingPostData: true
+      loadingPostData: true,
+      prizeModalState: false,
+      loadingPrizeData: true,
+      prizeData: []
     };
   }
 
@@ -56,6 +60,48 @@ class LeaderboardPage extends Component {
       };
     });
   };
+
+  openPrizes = () => {
+    this.togglePrizeModal();
+    this.getPrizeData();
+  };
+
+  togglePrizeModal = () => {
+    this.setState((prev, props) => {
+      const newState = !prev.prizeModalState;
+      return {
+        prizeModalState: newState,
+        prizeData: [],
+        loadingPrizeData: true
+      };
+    });
+  };
+
+  getPrizeData() {
+    const self = this;
+    let newArray = [];
+    const groupID = this.state.groupid;
+    const prizeRef = database.ref("prizes").child(groupID);
+
+    prizeRef.once("value", function(snapshot) {
+      if (snapshot.exists()) {
+        prizeRef.on("child_added", snap => {
+          newArray.push({
+            id: snap.key,
+            prize: snap.val().prize,
+            points: snap.val().points,
+            timestamp: snap.val().createdAt
+          });
+          self.setState({
+            prizeData: newArray,
+            loadingPrizeData: false
+          });
+        });
+      } else {
+        self.setState({ loadingPrizeData: false });
+      }
+    });
+  }
 
   openProfile = e => {
     this.toggleProfileModal();
@@ -367,7 +413,17 @@ class LeaderboardPage extends Component {
                         style={{ padding: "5px" }}
                       >
                         Leaderboard
+                        <a
+                          className="button is-info is-small is-pulled-right"
+                          onClick={this.openPrizes}
+                        >
+                          <span className="icon">
+                            <i className="fas fa-gift" />
+                          </span>
+                          <span>Rewards</span>
+                        </a>
                       </p>
+
                       <table style={{ width: "100%" }}>
                         <tbody>
                           <tr>
@@ -377,6 +433,7 @@ class LeaderboardPage extends Component {
                                   <p className="title is-5 has-text-white ">
                                     {this.state.groupName}
                                   </p>
+
                                   <div className="columns is-mobile is-vcentered">
                                     <div className="column has-text-centered">
                                       <h1>
@@ -493,6 +550,13 @@ class LeaderboardPage extends Component {
                 userData={this.state.selectedMemberData}
                 postData={this.state.postData}
                 loadingPostData={this.state.loadingPostData}
+                isManage={false}
+              />
+              <Prizes
+                closeModal={this.togglePrizeModal}
+                modalState={this.state.prizeModalState}
+                prizeData={this.state.prizeData}
+                loadingPrizeData={this.state.loadingPrizeData}
                 isManage={false}
               />
             </Fragment>

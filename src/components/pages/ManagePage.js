@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.min.css";
 
 import Reward from "../modals/Reward";
 import Profile from "../modals/Profile";
+import Prizes from "../modals/Prizes";
 import Header from "../Header";
 import Loading from "../Loading";
 import GroupNotFound from "../GroupNotFound";
@@ -33,16 +34,18 @@ class ManagePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      shareLink: "http://localhost:3000/" + this.props.params.groupid,
+      shareLink: "https://group-points.firebaseapp.com/" + this.props.params.groupid,
       groupid: this.props.params.groupid,
       groupName: "",
       rewardModalState: false,
+      prizeModalState: false,
       profileModalState: false,
       members: [],
       enteredURL: "",
       selectedMember: "",
       selectedMemberData: {},
       postData: [],
+      prizeData: [],
       groupExists: false,
       isAdmin: false,
       isMember: false,
@@ -52,7 +55,10 @@ class ManagePage extends Component {
       search: "",
       selectedPoints: "",
       loadingPostData: true,
-      loadingMembers: true
+      loadingMembers: true,
+      loadingPrizeData: true,
+      enteredPrize: "",
+      enteredPrizePoints: ""
     };
   }
 
@@ -165,11 +171,31 @@ class ManagePage extends Component {
     });
   };
 
+  openPrizes = () => {
+    this.togglePrizeModal();
+    this.getPrizeData();
+  };
+
   toggleRewardModal = () => {
     this.setState((prev, props) => {
       const newState = !prev.rewardModalState;
       return {
-        rewardModalState: newState
+        rewardModalState: newState,
+        selectedPoints: "",
+        enteredURL: ""
+      };
+    });
+  };
+
+  togglePrizeModal = () => {
+    this.setState((prev, props) => {
+      const newState = !prev.prizeModalState;
+      return {
+        prizeModalState: newState,
+        prizeData: [],
+        loadingPrizeData: true,
+        enteredPrize: "",
+        enteredPrizePoints: ""
       };
     });
   };
@@ -191,6 +217,14 @@ class ManagePage extends Component {
 
   handleRateChange = event => {
     this.setState({ selectedPoints: event.target.value });
+  };
+
+  handlePrizeChange = event => {
+    this.setState({ enteredPrize: event.target.value });
+  };
+
+  handlePrizePointsChange = event => {
+    this.setState({ enteredPrizePoints: event.target.value });
   };
 
   handleRewardFormSubmit = event => {
@@ -221,26 +255,49 @@ class ManagePage extends Component {
       .child(groupID)
       .child(memberId);
 
-    memberRef
-      .once("value", function(snapshot) {
-        points = snapshot.val().points + selectedPoints;
+    memberRef.once("value", function(snapshot) {
+      points = snapshot.val().points + selectedPoints;
 
-        memberRef.update({
-          points: points
-        });
+      memberRef.update({
+        points: points
+      });
 
-        groupRef.update({
-          points: points
-        });
+      groupRef.update({
+        points: points
+      });
 
-        postRef.push({
-          link: link,
-          points: selectedPoints,
-          createdAt: ServerValue.TIMESTAMP
-        });
+      postRef.push({
+        link: link,
+        points: selectedPoints,
+        createdAt: ServerValue.TIMESTAMP
+      });
 
-        self.getGroupMembers();
-      })
+      self.getGroupMembers();
+    });
+  };
+
+  handlePrizeFormSubmit = event => {
+    event.preventDefault();
+
+    const groupID = this.state.groupid;
+    const enteredPrize = this.state.enteredPrize;
+    const enteredPrizePoints = this.state.enteredPrizePoints;
+
+    const prizeRef = database.ref("prizes").child(groupID);
+
+    prizeRef.push({
+      prize: enteredPrize,
+      points: enteredPrizePoints,
+      createdAt: ServerValue.TIMESTAMP
+    });
+
+    this.setState({
+      enteredPrize: "",
+      enteredPrizePoints: "",
+      loadingPrizeData: true
+    });
+
+    this.getPrizeData();
   };
 
   removeDuplicates(myArr, prop) {
@@ -328,6 +385,32 @@ class ManagePage extends Component {
     });
   }
 
+  getPrizeData() {
+    const self = this;
+    let newArray = [];
+    const groupID = this.state.groupid;
+    const prizeRef = database.ref("prizes").child(groupID);
+
+    prizeRef.once("value", function(snapshot) {
+      if (snapshot.exists()) {
+        prizeRef.on("child_added", snap => {
+          newArray.push({
+            id: snap.key,
+            prize: snap.val().prize,
+            points: snap.val().points,
+            timestamp: snap.val().createdAt
+          });
+          self.setState({
+            prizeData: newArray,
+            loadingPrizeData: false
+          });
+        });
+      } else {
+        self.setState({ loadingPrizeData: false });
+      }
+    });
+  }
+
   goToLb = () => {
     this.setState({ redirectToLb: true });
   };
@@ -380,6 +463,20 @@ class ManagePage extends Component {
     } else {
       this.getPostData(this.state.selectedMemberData);
     }
+  };
+
+  handleDeletePrize = e => {
+    const id = e;
+    const groupID = this.state.groupid;
+
+    const prizeRef = database
+      .ref("prizes")
+      .child(groupID)
+      .child(id);
+
+    prizeRef.remove();
+
+    this.getPrizeData();
   };
 
   componentDidMount() {
@@ -475,6 +572,29 @@ class ManagePage extends Component {
                                 <div className="field is-grouped is-grouped-right">
                                   <p className="control">
                                     <a
+                                      className="button is-info is-small"
+                                      onClick={this.openPrizes}
+                                    >
+                                      <span className="icon">
+                                        <i className="fas fa-gift" />
+                                      </span>
+                                      <span>Prizes</span>
+                                    </a>
+                                  </p>
+
+                                  <p className="control">
+                                    <Link
+                                      to={"/" + this.state.groupid + "/home"}
+                                      className="button is-primary is-small"
+                                    >
+                                      <span className="icon">
+                                        <i className="fas fa-trophy" />
+                                      </span>
+                                      <span>Leaderboard</span>
+                                    </Link>
+                                  </p>
+                                  <p className="control">
+                                    <a
                                       className="button is-link is-small"
                                       target="_blank"
                                       href={
@@ -487,17 +607,6 @@ class ManagePage extends Component {
                                       </span>
                                       <span>Open Group</span>
                                     </a>
-                                  </p>
-                                  <p className="control">
-                                    <Link
-                                      to={"/" + this.state.groupid + "/home"}
-                                      className="button is-primary is-small"
-                                    >
-                                      <span className="icon">
-                                        <i className="fas fa-trophy" />
-                                      </span>
-                                      <span>Leaderboard</span>
-                                    </Link>
                                   </p>
                                 </div>
                               </div>
@@ -681,10 +790,10 @@ class ManagePage extends Component {
                 <Reward
                   closeModal={this.toggleRewardModal}
                   modalState={this.state.rewardModalState}
+                  value={this.state.enteredURL}
+                  selectValue={this.state.selectedPoints}
                   handleChange={this.handleURLChange}
                   handleFormSubmit={this.handleRewardFormSubmit}
-                  value={this.enteredURL}
-                  selectValue={this.selectedPoints}
                   handleRateChange={this.handleRateChange}
                 />
                 <Profile
@@ -695,6 +804,19 @@ class ManagePage extends Component {
                   loadingPostData={this.state.loadingPostData}
                   isManage={true}
                   handleDeleteActivity={this.handleDeleteActivity}
+                />
+                <Prizes
+                  closeModal={this.togglePrizeModal}
+                  modalState={this.state.prizeModalState}
+                  prizeData={this.state.prizeData}
+                  loadingPrizeData={this.state.loadingPrizeData}
+                  handleDelete={this.handleDeletePrize}
+                  handleFormSubmit={this.handlePrizeFormSubmit}
+                  handlePrizeChange={this.handlePrizeChange}
+                  handlePointsChange={this.handlePrizePointsChange}
+                  enteredPrize={this.state.enteredPrize}
+                  enteredPoints={this.state.enteredPrizePoints}
+                  isManage={true}
                 />
                 <ToastContainer
                   position="top-center"
