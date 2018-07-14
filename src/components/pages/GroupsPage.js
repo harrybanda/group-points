@@ -19,7 +19,8 @@ class GroupsPage extends Component {
       modalState: false,
       groupExists: false,
       loading: true,
-      loadingButton: false
+      loadingButton: false,
+      unfilteredGroups: []
     };
   }
 
@@ -115,14 +116,21 @@ class GroupsPage extends Component {
           const token = result.credential.accessToken;
           axios
             .get(
-              `https://graph.facebook.com/me?access_token=${token}&fields=groups,first_name`
+              `https://graph.facebook.com/me?access_token=${token}&fields=groups{administrator,name},first_name`
             )
             .then(result => {
               let firstname = result.data.first_name;
               localStorage.setItem("firstname", firstname);
-
-              let groupsData = result.data.groups.data;
-              localStorage.setItem("groups", JSON.stringify(groupsData));
+              this.setState(
+                { unfilteredGroups: result.data.groups.data },
+                function() {
+                  var unfilterd = this.state.unfilteredGroups;
+                  var newArray = unfilterd.filter(function(e) {
+                    return e.administrator === true;
+                  });
+                  localStorage.setItem("groups", JSON.stringify(newArray));
+                }
+              );
             })
             .catch(error => console.log(error));
         }

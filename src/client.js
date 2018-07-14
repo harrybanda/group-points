@@ -14,6 +14,6 @@ const config = {
 const app = firebase.initializeApp(config);
 const database = firebase.database();
 const provider = new firebase.auth.FacebookAuthProvider();
-provider.addScope('user_managed_groups');
+provider.addScope('groups_access_member_info');
 
 export { app, provider, database };
